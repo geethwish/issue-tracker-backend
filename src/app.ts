@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
-import issueRoutes from "./routes/issueRoutes";
 import dotenv from "dotenv";
 import prisma from "./config";
+
+// Routes
+import issueRoutes from "./routes/issueRoutes";
+import authRoutes from "./routes/authRoutes";
 
 const app = express();
 
@@ -17,6 +20,7 @@ app.use(
 
 app.use(express.json());
 app.use("/api/issues", issueRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 3001;
 
