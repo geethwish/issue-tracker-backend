@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import prisma from "../config";
 
-export const createIssue = async (req: Request, res: Response) => {
+export const createIssue = async (req: Request | any, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const { title, description, severity, priority } = req.body;
     const issue = await prisma.issue.create({
@@ -10,7 +14,7 @@ export const createIssue = async (req: Request, res: Response) => {
         description,
         severity,
         priority,
-        userId: req.user?.userId,
+        userId: req.user.userId,
       },
     });
     res.status(201).json(issue);
@@ -20,7 +24,11 @@ export const createIssue = async (req: Request, res: Response) => {
   }
 };
 
-export const getIssues = async (req: Request, res: Response) => {
+export const getIssues = async (req: Request | any, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const issues = await prisma.issue.findMany({
       where: { userId: req.user.userId },
@@ -32,7 +40,11 @@ export const getIssues = async (req: Request, res: Response) => {
   }
 };
 
-export const getIssueById = async (req: Request, res: Response) => {
+export const getIssueById = async (req: Request | any, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const issue = await prisma.issue.findUnique({
       where: { id: Number(req.params.id) },
@@ -47,7 +59,11 @@ export const getIssueById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateIssue = async (req: Request, res: Response) => {
+export const updateIssue = async (req: Request | any, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const issue = await prisma.issue.findUnique({
       where: { id: Number(req.params.id) },
@@ -66,7 +82,11 @@ export const updateIssue = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteIssue = async (req: Request, res: Response) => {
+export const deleteIssue = async (req: Request | any, res: Response) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
     const issue = await prisma.issue.findUnique({
       where: { id: Number(req.params.id) },
