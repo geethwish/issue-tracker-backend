@@ -17,8 +17,6 @@ async function main() {
       name: "Admin User",
     },
   });
-
-  console.log({ adminUser });
 }
 
 main()

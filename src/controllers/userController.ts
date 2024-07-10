@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import prisma from "../config";
 
 export const getUserDetails = async (req: any, res: Response) => {
-  console.log("here", req.user);
-
   try {
     const userId = req.user?.userId;
     if (!userId) {
