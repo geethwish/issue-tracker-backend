@@ -30,9 +30,25 @@ export const getIssues = async (req: Request | any, res: Response) => {
   }
 
   try {
-    const issues = await prisma.issue.findMany({
-      where: { userId: req.user.userId },
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      select: {
+        email: true,
+        id: true,
+        name: true,
+        role: true,
+      },
     });
+
+    let issues: any[] = [];
+    if (user?.role === "ADMIN") {
+      issues = await prisma.issue.findMany();
+    } else {
+      issues = await prisma.issue.findMany({
+        where: { userId: req.user.userId },
+      });
+    }
+
     res.status(200).json(issues);
   } catch (err) {
     const error = err as Error;
@@ -45,13 +61,27 @@ export const getIssueById = async (req: Request | any, res: Response) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.userId },
+    select: {
+      email: true,
+      id: true,
+      name: true,
+      role: true,
+    },
+  });
+
   try {
     const issue = await prisma.issue.findUnique({
       where: { id: Number(req.params.id) },
     });
-    if (!issue || issue.userId !== req.user.userId) {
-      return res.status(404).json({ error: "Issue not found" });
+
+    if (user?.role !== "ADMIN") {
+      if (!issue || issue.userId !== req.user.userId) {
+        return res.status(404).json({ error: "Issue not found" });
+      }
     }
+
     res.status(200).json(issue);
   } catch (err) {
     const error = err as Error;
@@ -64,13 +94,27 @@ export const updateIssue = async (req: Request | any, res: Response) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.userId },
+    select: {
+      email: true,
+      id: true,
+      name: true,
+      role: true,
+    },
+  });
+
   try {
     const issue = await prisma.issue.findUnique({
       where: { id: Number(req.params.id) },
     });
-    if (!issue || issue.userId !== req.user.userId) {
-      return res.status(404).json({ error: "Issue not found" });
+
+    if (user?.role !== "ADMIN") {
+      if (!issue || issue.userId !== req.user.userId) {
+        return res.status(404).json({ error: "Issue not found" });
+      }
     }
+
     const updatedIssue = await prisma.issue.update({
       where: { id: Number(req.params.id) },
       data: req.body,
@@ -87,12 +131,24 @@ export const deleteIssue = async (req: Request | any, res: Response) => {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.userId },
+    select: {
+      email: true,
+      id: true,
+      name: true,
+      role: true,
+    },
+  });
+
   try {
     const issue = await prisma.issue.findUnique({
       where: { id: Number(req.params.id) },
     });
-    if (!issue || issue.userId !== req.user.userId) {
-      return res.status(404).json({ error: "Issue not found" });
+    if (user?.role !== "ADMIN") {
+      if (!issue || issue.userId !== req.user.userId) {
+        return res.status(404).json({ error: "Issue not found" });
+      }
     }
     await prisma.issue.delete({
       where: { id: Number(req.params.id) },
