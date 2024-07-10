@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start": "node src/app.js",
     "dev": "ts-node-dev --respawn src/app.ts",
     "test": "jest",
     "seed": "ts-node prisma/seed.ts"
